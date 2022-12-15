@@ -3,7 +3,21 @@ The source code for the machine learning of the DCAITI project: KI-basierte Algo
 
 # Setup
 
-wip...
+## YOLO v5
+
+### Install Requirements
+
+```
+git clone https://github.com/ultralytics/yolov5  # clone
+cd yolov5
+pip install -r requirements.txt  # install
+```
+
+### Train
+* [Train custom data](https://github.com/ultralytics/yolov5/wiki/Train-Custom-Data)
+
+### Convert to TF Lite
+Follow this [guide](https://github.com/ultralytics/yolov5/issues/251)
 
 # Data
 ## Dataset
