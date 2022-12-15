@@ -11,7 +11,7 @@ The source code for the machine learning of the DCAITI project: KI-basierte Algo
 * https://github.com/WongKinYiu/yolov7
 
 # Data layout
-**note: images and matching label need to have the same name**
+**note: images and matching label need to have the same name** <br/>
 Labels follow the formatting class x_center y_center width height`
 
 * dataset
