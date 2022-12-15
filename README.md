@@ -19,26 +19,4 @@ wip...
 **note: images and matching label need to have the same name** <br/>
 Labels follow the formatting `class x_center y_center width height`
 
-* sample dataset layout
-  * data.yaml (take a look at data_sample.yaml)
-  * test
-    * images
-      * 1.jpg
-      * ...
-    * labels
-      * 1.txt (take a look at label_sample.txt)
-      * ...
-  * train
-    * images
-      * 1.jpg
-      * ...
-    * labels
-      * 1.txt
-      * ...
-  * validation
-    * images
-      * 1.jpg
-      * ...
-    * labels
-      * 1.txt
-      * ...
+A sample dataset structure can be found in [data_layout.md](data_layout.md)
