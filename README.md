@@ -9,3 +9,23 @@ The source code for the machine learning of the DCAITI project: KI-basierte Algo
 # Machine learning algorithms
 * https://github.com/ultralytics/yolov5
 * https://github.com/WongKinYiu/yolov7
+
+# Data foramtting
+**note: images and matching label need to have the same name**
+* dataset
+  * 
+  * test
+    * images
+      * 1.jpg  
+    * labels
+      * 1.txt
+  * train
+    * images
+      * 1.jpg  
+    * labels
+      * 1.txt
+  * validation
+    * images
+      * 1.jpg  
+    * labels
+      * 1.txt
