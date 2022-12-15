@@ -3,6 +3,10 @@ The source code for the machine learning of the DCAITI project: KI-basierte Algo
 
 # Setup
 
+## Data pre-procesing
+
+wip...
+
 ## YOLO v5
 
 ### Install Requirements
@@ -14,6 +18,13 @@ pip install -r requirements.txt  # install
 ```
 
 ### Train
+
+`python train.py --data coco.yaml --epochs 300 --weights '' --cfg yolov5n.yaml  --batch-size 128`
+
+All parameters for training can be found [here](https://github.com/ultralytics/yolov5/blob/1ae91940abe9ca3e064784bb18c12271ab3157b4/train.py#L433)
+
+Advanced:
+* [How to choose parameters](https://github.com/ultralytics/yolov5/wiki/Tips-for-Best-Training-Results)
 * [Train custom data](https://github.com/ultralytics/yolov5/wiki/Train-Custom-Data)
 
 ### Convert to TF Lite
