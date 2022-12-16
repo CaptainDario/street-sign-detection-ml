@@ -1,3 +1,5 @@
+import os.path
+
 import pandas as pd
 import sys
 import matplotlib.pyplot as plt
@@ -12,7 +14,7 @@ def parse_args():
     elif len(sys.argv) == 3:
         return sys.argv[1], sys.argv[2], 1360, 800
     else:
-        print("Usage: python dataset_convert.py <input_file> <output_file> [<pixels_x> <pixels_y>]")
+        print("Usage: python dataset_convert.py <input_file> <output_directory> [<pixels_x> <pixels_y>]")
         exit(1)
 
 
@@ -23,8 +25,6 @@ def convert(df):
     coords_tuples = df.apply(lambda row: convert_coordinates((row[1], row[2]), (row[3], row[4])), axis=1)
     coords_tuples = coords_tuples.apply(pd.Series)
     df.iloc[:, 1:5] = coords_tuples
-    # move last column to first
-    df.iloc[:, [0, 1, 2, 3, 4, 5]] = df.iloc[:, [5, 0, 1, 2, 3, 4]]
     print('\nConverted coordinates:')
     print(df)
     return df
@@ -37,8 +37,16 @@ def read_data():
 
 
 def write_data(df):
-    # write data to file
-    df.to_csv(out_file, sep=' ', header=None, index=None)
+    # write each row into a separate file
+    print("Writing data to files:")
+    os.makedirs(out_dir, exist_ok=True)
+    for index, row in df.iterrows():
+        file_name = row[0].replace(".ppm", ".txt")
+        file_path = os.path.join(out_dir, file_name)
+        with open(file_path, 'w') as f:
+            f.write(f"{row[5]} {row[1]} {row[2]} {row[3]} {row[4]}")
+        print(f"File {file_name} written.")
+    #df.to_csv(out_file, sep=' ', header=None, index=None)
 
 
 def convert_coordinates(top_left, bottom_right):
@@ -49,11 +57,12 @@ def convert_coordinates(top_left, bottom_right):
     height = (bottom_right[1] - top_left[1]) / pixels_y
     return x_center, y_center, width, height
 
-def annotate_sample(sample_path : str, annotation_path : str):
+
+def annotate_sample(sample_path: str, annotation_path: str):
     """ Loads a sample from `sample_path` and an annotation from `annotation_path`.
     Than draws the BBoxs from the annotations on the image and save the image to 
     """
-    
+
     with open(annotation_path, encoding="utf8", mode="r") as f:
         bboxs = [[float(__a) for __a in _a.split(" ")] for _a in f.read().split("\n")]
 
@@ -69,19 +78,19 @@ def annotate_sample(sample_path : str, annotation_path : str):
     for b in bboxs:
         # Create a Rectangle patch
         rect = patches.Rectangle(
-            (b[1]*im.width-b[3]*im.width/2, b[2]*im.height-b[4]*im.height/2), b[3]*im.width, b[4]*im.height,
+            (b[1] * im.width - b[3] * im.width / 2, b[2] * im.height - b[4] * im.height / 2), b[3] * im.width,
+                                                                                              b[4] * im.height,
             linewidth=1, edgecolor='r', facecolor='none')
 
         # Add the patch to the Axes
         ax.add_patch(rect)
 
     plt.savefig("sample.png")
-    
 
 
 if __name__ == '__main__':
-    in_file, out_file, pixels_x, pixels_y = parse_args()
+    in_file, out_dir, pixels_x, pixels_y = parse_args()
     df = read_data()
     convert(df)
     write_data(df)
-    #annotate_sample(sample_path, annotation_path)
+    # annotate_sample(sample_path, annotation_path)
