@@ -10,7 +10,7 @@ Install the necessary packages and run the data conversion script.
 
 ``` bash
 python -m pip install -r dataset_creation/requirements.txt
-python dataset_creation/dataset_convert.py
+python dataset_creation/dataset_convert.py path/to/the/downloaded/dataset path/where/the/converted/dataset/should/be/stored
 ```
 
 ### YOLO v5
