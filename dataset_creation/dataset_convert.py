@@ -1,20 +1,9 @@
-import os.path
+import sys
+from os import path, makedirs
 
 import pandas as pd
-import sys
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-from PIL import Image
 
-
-def parse_args():
-    if len(sys.argv) == 5:
-        return sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4])
-    elif len(sys.argv) == 3:
-        return sys.argv[1], sys.argv[2], 1360, 800
-    else:
-        print("Usage: python dataset_convert.py <input_file> <output_directory> [<pixels_x> <pixels_y>]")
-        exit(1)
+import utils
 
 
 def convert(df: pd.DataFrame) -> pd.DataFrame:
@@ -43,9 +32,9 @@ def write_data(df: pd.DataFrame, out_dir: str):
         same output file using newline as a delimiter
     '''
     print("\tWriting data to files")
-    os.makedirs(out_dir, exist_ok=True)
+    makedirs(out_dir, exist_ok=True)
     for index, row in df.iterrows():
-        print_progress_bar(
+        utils.print_progress_bar(
             iteration= index+1,
             total= len(df),
             prefix= '\tWritten Files:',
@@ -53,9 +42,9 @@ def write_data(df: pd.DataFrame, out_dir: str):
             length= 30
         )
         file_name = row[0].replace(".ppm", ".txt")
-        file_path = os.path.join(out_dir, file_name)
+        file_path = path.join(out_dir, file_name)
         # append additional labels to existing file
-        if (os.path.exists(file_path)):
+        if (path.exists(file_path)):
             with open(file_path, 'a') as f:
                 f.write(f"\n{row[5]} {row[1]} {row[2]} {row[3]} {row[4]}")
         else:
@@ -78,57 +67,14 @@ def convert_coordinates(top_left: list, bottom_right: list) -> list:
     return x_center, y_center, width, height
 
 
-def annotate_sample(sample_path: str, annotation_path: str):
-    """ Loads a sample from `sample_path` and an annotation from `annotation_path`.
-        Then draws the BBoxs from the annotations on the image and saves the image too 
-    """
-    with open(annotation_path, encoding="utf8", mode="r") as f:
-        bboxs = [[float(__a) for __a in _a.split(" ")] for _a in f.read().split("\n")]
-
-    im = Image.open(sample_path)
-
-    # Create figure and axes
-    fig, ax = plt.subplots(figsize=(20, 20))
-
-    # Display the image
-    ax.imshow(im)
-
-    # label, X, Y, Width, and Height
-    for b in bboxs:
-        # Create a Rectangle patch
-        rect = patches.Rectangle(
-            (b[1] * im.width - b[3] * im.width / 2, b[2] * im.height - b[4] * im.height / 2), b[3] * im.width,
-                                                                                              b[4] * im.height,
-            linewidth=1, edgecolor='r', facecolor='none')
-
-        # Add the patch to the Axes
-        ax.add_patch(rect)
-
-    plt.savefig("sample.png")
-
-
-def print_progress_bar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', print_end = "\r"):
-    """
-    Call in a loop to create terminal progress bar
-    @params:
-        iteration   - Required  : current iteration (Int)
-        total       - Required  : total iterations (Int)
-        prefix      - Optional  : prefix string (Str)
-        suffix      - Optional  : suffix string (Str)
-        decimals    - Optional  : positive number of decimals in percent complete (Int)
-        length      - Optional  : character length of bar (Int)
-        fill        - Optional  : bar fill character (Str)
-        print_end   - Optional  : end character (e.g. "\r", "\r\n") (Str)
-    
-    source: https://stackoverflow.com/questions/3173320/text-progress-bar-in-terminal-with-block-characters/13685020
-    """
-    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
-    filled_length = int(length * iteration // total)
-    bar = fill * filled_length + '-' * (length - filled_length)
-    print(f'\r{prefix} |{bar}| {percent}% {suffix}', end = print_end)
-    # Print New Line on Complete
-    if iteration == total: 
-        print()
+def parse_args():
+    if len(sys.argv) == 5:
+        return sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4])
+    elif len(sys.argv) == 3:
+        return sys.argv[1], sys.argv[2], 1360, 800
+    else:
+        print("Usage: python dataset_convert.py <input_file> <output_directory> [<pixels_x> <pixels_y>]")
+        exit(1)
 
 
 if __name__ == '__main__':
@@ -136,4 +82,3 @@ if __name__ == '__main__':
     df = read_data(in_file)
     convert(df)
     write_data(df, out_dir)
-    # annotate_sample(sample_path, annotation_path)
