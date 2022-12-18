@@ -20,7 +20,6 @@ def parse_args():
 def convert(df: pd.DataFrame) -> pd.DataFrame:
     ''' converts coordinates and returns them serialized into columns
     '''
-    # add converted coordinates column
     print("\tConverting coordinates")
     coords_tuples = df.apply(lambda row: convert_coordinates((row[1], row[2]), (row[3], row[4])), axis=1)
     coords_tuples = coords_tuples.apply(pd.Series)
@@ -43,10 +42,16 @@ def write_data(df: pd.DataFrame, out_dir: str):
         appends multiple labels of the same picture into the 
         same output file using newline as a delimiter
     '''
-    # write each row into a separate file
     print("\tWriting data to files")
     os.makedirs(out_dir, exist_ok=True)
     for index, row in df.iterrows():
+        print_progress_bar(
+            iteration= index+1,
+            total= len(df),
+            prefix= '\tWritten Files:',
+            suffix= 'Complete',
+            length= 30
+        )
         file_name = row[0].replace(".ppm", ".txt")
         file_path = os.path.join(out_dir, file_name)
         # append additional labels to existing file
@@ -56,7 +61,6 @@ def write_data(df: pd.DataFrame, out_dir: str):
         else:
             with open(file_path, 'w') as f:
                 f.write(f"{row[5]} {row[1]} {row[2]} {row[3]} {row[4]}")
-        # print(f"File {file_name} written.")
 
 
 def convert_coordinates(top_left: list, bottom_right: list) -> list:
@@ -101,6 +105,30 @@ def annotate_sample(sample_path: str, annotation_path: str):
         ax.add_patch(rect)
 
     plt.savefig("sample.png")
+
+
+def print_progress_bar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', print_end = "\r"):
+    """
+    Call in a loop to create terminal progress bar
+    @params:
+        iteration   - Required  : current iteration (Int)
+        total       - Required  : total iterations (Int)
+        prefix      - Optional  : prefix string (Str)
+        suffix      - Optional  : suffix string (Str)
+        decimals    - Optional  : positive number of decimals in percent complete (Int)
+        length      - Optional  : character length of bar (Int)
+        fill        - Optional  : bar fill character (Str)
+        print_end   - Optional  : end character (e.g. "\r", "\r\n") (Str)
+    
+    source: https://stackoverflow.com/questions/3173320/text-progress-bar-in-terminal-with-block-characters/13685020
+    """
+    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+    filled_length = int(length * iteration // total)
+    bar = fill * filled_length + '-' * (length - filled_length)
+    print(f'\r{prefix} |{bar}| {percent}% {suffix}', end = print_end)
+    # Print New Line on Complete
+    if iteration == total: 
+        print()
 
 
 if __name__ == '__main__':
