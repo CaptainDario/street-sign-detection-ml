@@ -129,3 +129,6 @@ dmypy.json
 .pyre/
 
 dataset_creation/.idea/
+
+# dataset
+data/

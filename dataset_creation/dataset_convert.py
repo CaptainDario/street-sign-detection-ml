@@ -43,8 +43,13 @@ def write_data(df):
     for index, row in df.iterrows():
         file_name = row[0].replace(".ppm", ".txt")
         file_path = os.path.join(out_dir, file_name)
-        with open(file_path, 'w') as f:
-            f.write(f"{row[5]} {row[1]} {row[2]} {row[3]} {row[4]}")
+        # append additional labels to existing file
+        if (os.path.exists(file_path)):
+            with open(file_path, 'a') as f:
+                f.write(f"\n{row[5]} {row[1]} {row[2]} {row[3]} {row[4]}")
+        else:
+            with open(file_path, 'w') as f:
+                f.write(f"{row[5]} {row[1]} {row[2]} {row[3]} {row[4]}")
         print(f"File {file_name} written.")
     #df.to_csv(out_file, sep=' ', header=None, index=None)
 
