@@ -6,11 +6,14 @@ The source code for the machine learning of the DCAITI project: KI-basierte Algo
 
 ### Data pre-procesing
 
-Install the necessary packages and run the data conversion script.
+Install the necessary packages and run the data scripts to convert the dataset.
+The conversion includes converting the coordinates from leftmost, upmost, rightmost and downmost to center_x, center_y, width, height and prepending the class label. 
+Afterwards annotating the data is possible with these converted coordinates. The annotated dataset should include BBoxes for all defined class-labels in each image. 
 
 ``` bash
 python -m pip install -r dataset_creation/requirements.txt
-python dataset_creation/dataset_convert.py path/to/the/downloaded/dataset path/where/the/converted/dataset/should/be/stored
+python dataset_creation/dataset_convert.py <path/to/the/downloaded/dataset> <path/where/the/converted/dataset/to/be/stored>
+python dataset_creation/dataset_annotation.py path/to/the/downloaded/dataset> <path/to/the/converted/coordinates> <path/to/the/annotated/dataset/to/be/stored>
 ```
 
 ### YOLO v5

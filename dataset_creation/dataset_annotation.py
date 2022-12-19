@@ -1,5 +1,5 @@
 import sys
-from os import path, listdir
+from os import path, listdir, makedirs
 
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
@@ -65,6 +65,7 @@ def annotate_all_samples(
     ''' annotates all samples from an `input directory` with coordinates from a `coordinates directory`.
         Expects sample files of type '.ppm' and coordinates of type '.txt'
     '''
+    makedirs(output_dir, exist_ok=True)
     coordinate_elements = listdir(input_dir_coordinates)
     for index in range(len(coordinate_elements)):
         utils.print_progress_bar(
