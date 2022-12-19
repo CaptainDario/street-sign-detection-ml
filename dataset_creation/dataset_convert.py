@@ -16,6 +16,20 @@ def convert(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def create_dataset_folder(dataset_path : str):
+    """ Creates a dataset folder structure matching the YOLO v5/7
+    input.
+
+    Args:
+        path (str): The path where the folder structure should be
+                    created.
+    """
+
+    for i in ["train", "test", "val"]:
+        for j in ["images", "labels"]:
+            makedirs(path.join(dataset_path, i, j), exist_ok=True)
+
+
 def read_data(in_file: str) -> pd.DataFrame:
     ''' reads data frome a relative or absolute path as a String,
         separates data with ';' \n
@@ -42,7 +56,7 @@ def write_data(df: pd.DataFrame, out_dir: str):
             length= 30
         )
         file_name = row[0].replace(".ppm", ".txt")
-        file_path = path.join(out_dir, file_name)
+        file_path = path.join(out_dir, "train", "labels", file_name)
         # append additional labels to existing file
         if (path.exists(file_path)):
             with open(file_path, 'a') as f:
@@ -73,12 +87,15 @@ def parse_args():
     elif len(sys.argv) == 3:
         return sys.argv[1], sys.argv[2], 1360, 800
     else:
-        print("Usage: python dataset_convert.py <input_file> <output_directory> [<pixels_x> <pixels_y>]")
+        print("Usage: python dataset_convert.py <input_directory> <output_directory> [<pixels_x> <pixels_y>]")
         exit(1)
 
 
 if __name__ == '__main__':
-    in_file, out_dir, pixels_x, pixels_y = parse_args()
-    df = read_data(in_file)
+    in_dir, out_dir, pixels_x, pixels_y = parse_args()
+    label_file = path.join(in_dir, "gt.txt")
+
+    create_dataset_folder(out_dir)
+    df = read_data(label_file)
     convert(df)
     write_data(df, out_dir)
