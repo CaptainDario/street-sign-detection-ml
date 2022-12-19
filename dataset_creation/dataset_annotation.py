@@ -17,6 +17,7 @@ def annotate_sample(
         Draws the BBoxs from the annotations on the image and saves the image too.
         Returns the path to the annotated file.
     """
+    # read annotations as bboxes
     with open(annotation_path, encoding="utf8", mode="r") as f:
         bboxs = [[float(__a) for __a in _a.split(" ")] for _a in f.read().split("\n")]
 
@@ -44,7 +45,16 @@ def annotate_sample(
         output_dir,
         f'{file_name}',
     )
-    plt.savefig(output_path)
+    plt.axis('off')
+    # removing whitespaces, background opacity, padding around figure
+    plt.savefig(
+        output_path,
+        bbox_inches='tight',
+        transparent=True, 
+        pad_inches=0
+    )
+    # closing pyplot window, freeing memory
+    plt.close()
     return output_path
 
 def annotate_all_samples(
