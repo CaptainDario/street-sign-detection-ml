@@ -65,6 +65,24 @@ def read_data(in_file: str) -> pd.DataFrame:
     return df
 
 
+def get_label_count(df: pd.DataFrame) -> pd.DataFrame:
+    ''' returns the count of the labels in the input DataFrame
+    '''
+    df = df.rename(columns= {
+        0:'sample',
+        1: 'x_center',
+        2: 'y_center',
+        3: 'width',
+        4: 'height',
+        5: 'label'
+    })
+
+    df_label_count = pd.DataFrame(columns=['label', 'label_count'])
+    df_label_count.label = df.label.value_counts().sort_index().index
+    df_label_count.label_count = df.label.value_counts().sort_index().values
+    return df_label_count
+
+
 def write_data(df: pd.DataFrame, out_dir: str):
     ''' writes out data of each picture into a separate file,
         appends multiple labels of the same picture into the 
