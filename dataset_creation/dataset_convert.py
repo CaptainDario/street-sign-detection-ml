@@ -1,5 +1,6 @@
 import sys
-from os import path, makedirs
+from os import path, makedirs, listdir
+from shutil import copy2
 
 import pandas as pd
 
@@ -28,6 +29,30 @@ def create_dataset_folder(dataset_path : str):
     for i in ["train", "test", "val"]:
         for j in ["images", "labels"]:
             makedirs(path.join(dataset_path, i, j), exist_ok=True)
+
+
+def copy_relevant_pictures(coordinate_dir: str, samples_dir: str, output_dir: str):
+    ''' copies all pictures that have coordiantes into the specified `output_dir`,
+        the location of the coordiante-pictures is based on the specified `coordiante_dir`
+        and the pictures to be copies are taken from the specified `samples_dir`
+    '''
+    coordinate_elements = listdir(coordinate_dir)
+    for index in range(len(coordinate_elements)):
+        utils.print_progress_bar(
+            iteration= index+1,
+            total= len(coordinate_elements),
+            prefix= '\tCopied Files:',
+            suffix= 'Complete',
+            length= 30
+        )
+        sample_path = path.join(
+            samples_dir,
+            coordinate_elements[index].replace('.txt', '.ppm')
+        )
+        copy2(
+            src= sample_path,
+            dst= output_dir
+        )
 
 
 def read_data(in_file: str) -> pd.DataFrame:
