@@ -65,11 +65,9 @@ def read_data(in_file: str) -> pd.DataFrame:
     return df
 
 
-def get_label_count(df: pd.DataFrame) -> pd.DataFrame:
-    ''' returns the count of the labels in the input DataFrame
-    '''
-    df = df.rename(columns= {
-        0:'sample',
+def rename_df(df):
+    return df.rename(columns= {
+        0: 'sample',
         1: 'x_center',
         2: 'y_center',
         3: 'width',
@@ -77,10 +75,30 @@ def get_label_count(df: pd.DataFrame) -> pd.DataFrame:
         5: 'label'
     })
 
+
+def get_label_count(df: pd.DataFrame) -> pd.DataFrame:
+    ''' returns the count of the labels in the input DataFrame
+    '''
     df_label_count = pd.DataFrame(columns=['label', 'label_count'])
     df_label_count.label = df.label.value_counts().sort_index().index
     df_label_count.label_count = df.label.value_counts().sort_index().values
     return df_label_count
+
+
+def get_singlelabel_samples(df):
+    df_singlelabel = pd.DataFrame(columns=['sample', 'x_center', 'y_center', 'width', 'height', 'label'])
+    for index,row in df.iterrows():
+        if(len(df[df['sample']== row['sample']]) == 1):
+            df_singlelabel.loc[index] = row
+    return df_singlelabel
+
+
+def get_multilabel_samples(df):
+    df_multilabel = pd.DataFrame(columns=['sample', 'x_center', 'y_center', 'width', 'height', 'label'])
+    for index,row in df.iterrows():
+        if(len(df[df['sample']== row['sample']]) > 1):
+            df_multilabel.loc[index] = row
+    return df_multilabel
 
 
 def write_data(df: pd.DataFrame, out_dir: str):
