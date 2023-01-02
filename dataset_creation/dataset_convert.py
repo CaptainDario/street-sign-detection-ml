@@ -106,9 +106,9 @@ def get_multilabel_samples(df):
 
 def split_number_into_3_weighted_parts(number, train_percentage, val_percentage, test_percentage):
     ''' The number will be splitted with their respective percentage and lower bounded. 
-        The difference to the total number will then be divided by 2 and added 
-        with an upper bound to the training part and with a lower bound to the 
-        validation part.
+        The difference to the total number will then be then weighted and lower bounded again
+        and added before being added to the parts. The remaining part will be added to the 
+        training-part.
 
         returns a list indicating the number of elements
         for training, validation and testing
@@ -117,14 +117,17 @@ def split_number_into_3_weighted_parts(number, train_percentage, val_percentage,
     val_nr = math.floor(number * val_percentage)
     test_nr = math.floor(number * test_percentage)
     difference = number - (train_nr + val_nr + test_nr)
-    train_additional = math.ceil(difference/2)
-    val_additional = math.floor(difference/2)
-    train_nr += train_additional
+    train_additional = math.floor(difference * train_percentage)
+    val_additional = math.floor(difference * val_percentage)
+    test_additional = math.floor(difference * test_percentage)
+    difference_2 = number - (train_nr + val_nr + test_nr + train_additional + val_additional + test_additional)
+    train_nr += train_additional + difference_2
     val_nr += val_additional
+    test_nr += test_additional
     return [train_nr, val_nr, test_nr]
 
 
-def distribute_samples_for_labels(df_samples_multilabel, df_samples_singlelabel, df_label_count):
+def distribute_samples_for_labels(df_samples_multilabel, df_samples_singlelabel, df_label_count, train_percentage, val_percentage, test_percentage):
     # shuffle label_count
     df_label_count = shuffle(df_label_count)
 
@@ -138,10 +141,10 @@ def distribute_samples_for_labels(df_samples_multilabel, df_samples_singlelabel,
     for index_label_count, row_label_count in df_label_count.iterrows():
         current_label = row_label_count['label']
         train_nr, val_nr, test_nr = split_number_into_3_weighted_parts(
-            row_label_count['label_count'],
-            0.7,
-            0.2,
-            0.1
+            number= row_label_count['label_count'],
+            train_percentage= train_percentage,
+            val_percentage= val_percentage,
+            test_percentage= test_percentage
         )
         
         # flag multilabel for training 
@@ -194,17 +197,18 @@ def distribute_samples_for_labels(df_samples_multilabel, df_samples_singlelabel,
             label= current_label,
             max_nr= test_nr
         )
-
+    # concat multilabel and singlelabel df
     df_concat = pd.concat([
         df_samples_multilabel,
         df_samples_singlelabel
     ])
+    # distribution per label
     for index_label_count, row_label_count in df_label_count.iterrows():
         train_percentage, val_percentage, test_percentage = get_flag_distribution_in_dataframe(df_concat, row_label_count['label'])
-        print('\t label ',row_label_count['label'],'percentage : train:', train_percentage, ', val: ', val_percentage, ', test: ', test_percentage)
-
+        print(f'\t label: {row_label_count["label"]}, elements: {row_label_count["label_count"]}, percentages: train: {train_percentage}, val: {val_percentage}, test: {test_percentage}')
+    # overall distribution 
     overall_train_percentage, overall_val_percentage, overall_test_percentage = get_flag_distribution_in_dataframe(df_concat)
-    print(f'---overall percentage: train: {overall_train_percentage}, val: {overall_val_percentage}, test: {overall_test_percentage}')
+    print(f'---overall distribution: train: {overall_train_percentage}, val: {overall_val_percentage}, test: {overall_test_percentage}')
     return df_concat.sort_index()
 
 
