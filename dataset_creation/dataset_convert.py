@@ -212,25 +212,6 @@ def distribute_samples_for_labels(df_samples_multilabel, df_samples_singlelabel,
     return df_concat.sort_index()
 
 
-'''WHERE AM I: 
-    for functionality:
-        [x] get constraints for nr of train, val samples
-        [x] break only out of current_labels loop
-        [x] implement for singlelabel afterwards 
-        [x] implement for validation
-        [x] implement for test
-        [x] update method signature
-        [x] shuffle before
-    for readability:
-        [x] source out checks, make agnostic
-        [x] remove layers of nested loops
-        * make agnostic: apply separately for train/val
-    for further implementations:
-        [x] calculate distribution
-        * rerun if distribution exceeds certain threshold
-'''
-
-
 def flag_multilabel_dataframe(dataframe, flag, label, max_nr):
     df_current_multilabel = dataframe[dataframe['label']==label]
     # filter out other samples
