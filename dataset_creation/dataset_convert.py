@@ -105,14 +105,22 @@ def get_multilabel_samples(df):
 
 
 def split_number_into_3_weighted_parts(number, train_percentage, val_percentage, test_percentage):
-    ''' takes the upper bound for the training and validation 
-        and the lower bound for the testing part. 
+    ''' The number will be splitted with their respective percentage and lower bounded. 
+        The difference to the total number will then be divided by 2 and added 
+        with an upper bound to the training part and with a lower bound to the 
+        validation part.
+
         returns a list indicating the number of elements
         for training, validation and testing
     '''
-    train_nr = math.ceil(number * train_percentage)
-    val_nr = math.ceil(number * val_percentage)
+    train_nr = math.floor(number * train_percentage)
+    val_nr = math.floor(number * val_percentage)
     test_nr = math.floor(number * test_percentage)
+    difference = number - (train_nr + val_nr + test_nr)
+    train_additional = math.ceil(difference/2)
+    val_additional = math.floor(difference/2)
+    train_nr += train_additional
+    val_nr += val_additional
     return [train_nr, val_nr, test_nr]
 
 
@@ -128,24 +136,26 @@ def distribute_samples_for_labels(df_samples_multilabel, df_samples_singlelabel,
     
     # iterate over all labels
     for index_label_count, row_label_count in df_label_count.iterrows():
-
+        current_label = row_label_count['label']
         train_nr, val_nr, test_nr = split_number_into_3_weighted_parts(
             row_label_count['label_count'],
             0.7,
             0.2,
             0.1
         )
-        print('label ', row_label_count['label'], '; label_count ', row_label_count['label_count'], '; train ', train_nr, '; val ', val_nr, '; test ', test_nr )
+        print('label ', current_label, '; label_count ', row_label_count['label_count'], '; train ', train_nr, '; val ', val_nr, '; test ', test_nr )
         
         # flag multilabel for training 
-        print('\t training --- multilabel: ',row_label_count['label'])
-        df_current_multilabel = df_samples_multilabel[df_samples_multilabel['label']==row_label_count['label']]
+        print('\t training --- multilabel: ',current_label)
+        df_current_multilabel = df_samples_multilabel[df_samples_multilabel['label']==current_label]
         print('\t\t', df_current_multilabel.shape)
         for index, row_current_label in df_current_multilabel.iterrows():
             # count train flag occurrences:
-            df_current_multilabel = df_samples_multilabel[df_samples_multilabel['label']==row_label_count['label']]
-            el_w_train_flag = df_current_multilabel['flag']=='train'
-            el_w_train_flag_sum = el_w_train_flag.sum()
+            el_w_train_flag_sum = get_flag_count_in_dataframe(
+                dataframe= df_samples_multilabel,
+                flag= 'train',
+                label= current_label
+            )
             # break if the sum of train flags exceeds the number of training elements
             if(el_w_train_flag_sum>=train_nr):
                 break
@@ -158,19 +168,23 @@ def distribute_samples_for_labels(df_samples_multilabel, df_samples_singlelabel,
         
         
         # flag singlelabel for training
-        print('\t training --- singlelabel: ', row_label_count['label'])
-        df_current_singlelabel = df_samples_singlelabel[df_samples_singlelabel['label']== row_label_count['label']]
+        print('\t training --- singlelabel: ', current_label)
+        df_current_singlelabel = df_samples_singlelabel[df_samples_singlelabel['label']== current_label]
         print('\t\t', df_current_singlelabel.shape)
         # occurrences of multilabel elements with train flag
-        df_current_multilabel = df_samples_multilabel[df_samples_multilabel['label']==row_label_count['label']]
-        el_w_train_flag_multilabel = df_current_multilabel['flag']=='train'
-        el_w_train_flag_multilabel_sum = el_w_train_flag_multilabel.sum()
+        el_w_train_flag_multilabel_sum = get_flag_count_in_dataframe(
+            dataframe= df_samples_multilabel,
+            flag= 'train',
+            label= current_label
+        )
         print('\t\t mutlilabel_trainflag_sum: ', el_w_train_flag_multilabel_sum)
 
         for index, row_current_label in df_current_singlelabel.iterrows():
-            df_current_singlelabel = df_samples_singlelabel[df_samples_singlelabel['label']==row_label_count['label']]
-            el_w_train_flag_singlelabel = df_current_singlelabel['flag']=='train'
-            el_w_train_flag_singlelabel_sum = el_w_train_flag_singlelabel.sum()
+            el_w_train_flag_singlelabel_sum = get_flag_count_in_dataframe(
+                dataframe= df_samples_singlelabel,
+                flag= 'train',
+                label= current_label
+            )
             el_w_train_flag_sum = el_w_train_flag_multilabel_sum + el_w_train_flag_singlelabel_sum
             if(el_w_train_flag_sum>=train_nr):
                 print('\t\t\t el_w_train_flag_sum', el_w_train_flag_sum)
@@ -181,17 +195,19 @@ def distribute_samples_for_labels(df_samples_multilabel, df_samples_singlelabel,
 
 
         # flag multilabel for validation
-        print('\t validation --- multilabel: ',row_label_count['label'])
-        df_current_multilabel = df_samples_multilabel[df_samples_multilabel['label']==row_label_count['label']]
+        print('\t validation --- multilabel: ',current_label)
+        df_current_multilabel = df_samples_multilabel[df_samples_multilabel['label']==current_label]
         df_current_multilabel_not_training = df_current_multilabel[df_current_multilabel['flag'] != 'train']
         print('\t\t', df_current_multilabel_not_training.shape)
         for index, row_current_label in df_current_multilabel_not_training.iterrows():
             # count val flag occurrences:
-            df_current_multilabel = df_samples_multilabel[df_samples_multilabel['label']==row_label_count['label']]
-            # TODO: is that actually needed?
+            df_current_multilabel = df_samples_multilabel[df_samples_multilabel['label']==current_label]
             df_current_multilabel_not_training = df_current_multilabel[df_current_multilabel['flag'] != 'train']
-            el_w_val_flag = df_current_multilabel_not_training['flag']=='val'
-            el_w_val_flag_sum = el_w_val_flag.sum()
+            el_w_val_flag_sum = get_flag_count_in_dataframe(
+                dataframe= df_current_multilabel_not_training,
+                flag= 'val',
+                label= current_label
+            )
             # break if the sum of train flags exceeds the number of validation elements
             if(el_w_val_flag_sum>=val_nr):
                 break
@@ -203,23 +219,29 @@ def distribute_samples_for_labels(df_samples_multilabel, df_samples_singlelabel,
                 df_samples_multilabel.at[index_2, 'flag'] = 'val'
             
         # flag singlelabel for validation
-        print('\t validation --- singlelabel: ', row_label_count['label'])
-        df_current_singlelabel = df_samples_singlelabel[df_samples_singlelabel['label']== row_label_count['label']]
+        print('\t validation --- singlelabel: ', current_label)
+        df_current_singlelabel = df_samples_singlelabel[df_samples_singlelabel['label']== current_label]
         df_current_singlelabel_not_training = df_current_singlelabel[df_current_singlelabel['flag'] != 'train']
         print('\t\t', df_current_singlelabel_not_training.shape)
         # occurrences of singlelable elements with validation flag
-        df_current_multilabel = df_samples_multilabel[df_samples_multilabel['label']==row_label_count['label']]
+        df_current_multilabel = df_samples_multilabel[df_samples_multilabel['label']==current_label]
         # TODO: is that actually needed?
         df_current_multilabel_not_training = df_current_multilabel[df_current_multilabel['flag'] != 'train']
-        el_w_val_flag_multilabel = df_current_multilabel_not_training['flag']=='val'
-        el_w_val_flag_multilabel_sum = el_w_val_flag_multilabel.sum()
+        el_w_val_flag_multilabel_sum = get_flag_count_in_dataframe(
+            dataframe= df_current_multilabel_not_training,
+            flag= 'val',
+            label= current_label
+        )
         print('\t\t mutlilabel_valflag_sum: ', el_w_val_flag_multilabel_sum)
 
         for index, row_current_label in df_current_singlelabel_not_training.iterrows():
-            df_current_singlelabel = df_samples_singlelabel[df_samples_singlelabel['label']== row_label_count['label']]
+            df_current_singlelabel = df_samples_singlelabel[df_samples_singlelabel['label']== current_label]
             df_current_singlelabel_not_training = df_current_singlelabel[df_current_singlelabel['flag'] != 'train']
-            el_w_val_flag_singlelabel = df_current_singlelabel_not_training['flag']=='val'
-            el_w_val_flag_singlelabel_sum = el_w_val_flag_singlelabel.sum()
+            el_w_val_flag_singlelabel_sum = get_flag_count_in_dataframe(
+                dataframe= df_current_singlelabel_not_training,
+                flag= 'val',
+                label= current_label
+            )
             el_w_val_flag_sum = el_w_val_flag_multilabel_sum + el_w_val_flag_singlelabel_sum
             if(el_w_val_flag_sum>=val_nr):
                 print('\t\t\t el_w_val_flag_sum', el_w_val_flag_sum)
@@ -229,17 +251,20 @@ def distribute_samples_for_labels(df_samples_multilabel, df_samples_singlelabel,
             df_samples_singlelabel.at[index, 'flag'] = 'val'
 
         # flag multilabel for testing
-        print('\t testing --- multilabel: ',row_label_count['label'])
-        df_current_multilabel = df_samples_multilabel[df_samples_multilabel['label']==row_label_count['label']]
+        print('\t testing --- multilabel: ',current_label)
+        df_current_multilabel = df_samples_multilabel[df_samples_multilabel['label']==current_label]
         df_current_multilabel_testing = df_current_multilabel[(df_current_multilabel['flag'] != 'train') & (df_current_multilabel['flag'] != 'val')]
         print('\t\t', df_current_multilabel_testing.shape)
         for index, row_current_label in df_current_multilabel_testing.iterrows():
             # count val flag occurrences:
-            df_current_multilabel = df_samples_multilabel[df_samples_multilabel['label']==row_label_count['label']]
+            df_current_multilabel = df_samples_multilabel[df_samples_multilabel['label']==current_label]
             # TODO: is that actually needed?
             df_current_multilabel_testing = df_current_multilabel[(df_current_multilabel['flag'] != 'train') & (df_current_multilabel['flag'] != 'val')]
-            el_w_test_flag = df_current_multilabel_testing['flag']=='test'
-            el_w_test_flag_sum = el_w_test_flag.sum()
+            el_w_test_flag_sum = get_flag_count_in_dataframe(
+                dataframe= df_current_multilabel_testing,
+                flag= 'test',
+                label= current_label
+            )
             # break if the sum of train flags exceeds the number of validation elements
             if(el_w_test_flag_sum>=test_nr):
                 break
@@ -251,23 +276,29 @@ def distribute_samples_for_labels(df_samples_multilabel, df_samples_singlelabel,
                 df_samples_multilabel.at[index_2, 'flag'] = 'test'
             
         # flag singlelabel for testing
-        print('\t testing --- singlelabel: ', row_label_count['label'])
-        df_current_singlelabel = df_samples_singlelabel[df_samples_singlelabel['label']== row_label_count['label']]
+        print('\t testing --- singlelabel: ', current_label)
+        df_current_singlelabel = df_samples_singlelabel[df_samples_singlelabel['label']== current_label]
         df_current_singlelabel_testing = df_current_singlelabel[(df_current_singlelabel['flag'] != 'train') & (df_current_singlelabel['flag'] != 'val')]
         print('\t\t', df_current_singlelabel_testing.shape)
         # occurrences of singlelable elements with validation flag
-        df_current_multilabel = df_samples_multilabel[df_samples_multilabel['label']==row_label_count['label']]
+        df_current_multilabel = df_samples_multilabel[df_samples_multilabel['label']==current_label]
         # TODO: is that actually needed?
         df_current_multilabel_testing = df_current_multilabel[(df_current_multilabel['flag'] != 'train') & (df_current_multilabel['flag'] != 'val')]
-        el_w_test_flag_multilabel = df_current_multilabel_testing['flag']=='test'
-        el_w_test_flag_multilabel_sum = el_w_test_flag_multilabel.sum()
+        el_w_test_flag_multilabel_sum = get_flag_count_in_dataframe(
+                dataframe= df_current_multilabel_testing,
+                flag= 'test',
+                label= current_label
+            )
         print('\t\t mutlilabel_testflag_sum: ', el_w_test_flag_multilabel_sum)
 
         for index, row_current_label in df_current_singlelabel_testing.iterrows():
-            df_current_singlelabel = df_samples_singlelabel[df_samples_singlelabel['label']== row_label_count['label']]
+            df_current_singlelabel = df_samples_singlelabel[df_samples_singlelabel['label']== current_label]
             df_current_singlelabel_testing = df_current_singlelabel[(df_current_singlelabel['flag'] != 'train') & (df_current_singlelabel['flag'] != 'val')]
-            el_w_test_flag_singlelabel = df_current_singlelabel_testing['flag']=='test'
-            el_w_test_flag_singlelabel_sum = el_w_test_flag_singlelabel.sum()
+            el_w_test_flag_singlelabel_sum = get_flag_count_in_dataframe(
+                dataframe= df_current_singlelabel_testing,
+                flag= 'test',
+                label= current_label
+            )
             el_w_test_flag_sum = el_w_test_flag_multilabel_sum + el_w_test_flag_singlelabel_sum
             if(el_w_test_flag_sum>=test_nr):
                 print('\t\t\t el_w_test_flag_sum', el_w_test_flag_sum)
@@ -276,6 +307,17 @@ def distribute_samples_for_labels(df_samples_multilabel, df_samples_singlelabel,
             # set flag for training
             df_samples_singlelabel.at[index, 'flag'] = 'test'
 
+    df_concat = pd.concat([
+        df_samples_multilabel,
+        df_samples_singlelabel
+    ])
+    for index_label_count, row_label_count in df_label_count.iterrows():
+        train_percentage, val_percentage, test_percentage = get_flag_distribution_in_dataframe(df_concat, row_label_count['label'])
+        print('\t label ',row_label_count['label'],'percentage : train:', train_percentage, ', val: ', val_percentage, ', test: ', test_percentage)
+
+    overall_train_percentage, overall_val_percentage, overall_test_percentage = get_flag_distribution_in_dataframe(df_concat)
+    print(f'---overall percentage: train: {overall_train_percentage}, val: {overall_val_percentage}, test: {overall_test_percentage}')
+    return df_concat.sort_index()
 
 
 '''WHERE AM I: 
@@ -292,10 +334,26 @@ def distribute_samples_for_labels(df_samples_multilabel, df_samples_singlelabel,
         * remove layers of nested loops
         * make agnostic: apply separately for train/val
     for further implementations:
-        * calculate distribution
+        [x] calculate distribution
         * rerun if distribution exceeds certain threshold
 '''
 
+def get_flag_count_in_dataframe(dataframe, flag, label= None):
+    if label is not None: 
+        dataframe = dataframe[dataframe['label']==label]
+    return (dataframe['flag']==flag).sum()
+
+
+def get_flag_distribution_in_dataframe(dataframe, label= None):
+    if label is not None: 
+        dataframe = dataframe[dataframe['label']==label]
+    train_count = get_flag_count_in_dataframe(dataframe, 'train', label)
+    val_count = get_flag_count_in_dataframe(dataframe, 'val', label)
+    test_count = get_flag_count_in_dataframe(dataframe, 'test', label)
+    train_percentage = train_count / len(dataframe) 
+    val_percentage = val_count / len(dataframe) 
+    test_percentage = test_count / len(dataframe) 
+    return train_percentage, val_percentage, test_percentage
 
 
 def write_data(df: pd.DataFrame, out_dir: str):
