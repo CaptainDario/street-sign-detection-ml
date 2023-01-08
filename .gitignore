@@ -132,3 +132,11 @@ dataset_creation/.idea/
 
 # dataset
 data/
+data.yaml
+
+# ignore the output of the training
+runs/**
+yolov5/runs/**
+
+# ignore weight files
+*.pt
