@@ -1,5 +1,7 @@
-# street_sign_detection_ml
-The source code for the machine learning of the DCAITI project: KI-basierte Algorithmen zur Objektdetektion und Klassifizierung für mobile Plattformen
+<img class="center" src="https://github.com/CaptainDario/street_sign_detection_app/blob/main/assets/icon/dcaiti.png?raw=true" height=75><img class="center" src="https://github.com/CaptainDario/street_sign_detection_app/blob/main/assets/icon/icon.png?raw=true" height=75>
+
+The source code of the machine learning part of the DCAITI project: "KI-basierte Algorithmen zur Objektdetektion und Klassifizierung für mobile Plattformen".
+The project of the flutter app can be found [here](https://github.com/CaptainDario/street_sign_detection_app).
 
 # Setup
 
