@@ -1,0 +1,16 @@
+
+train: ../data/train_data/images/train  
+val: ../data/train_data/images/val 
+test: ../data/train_data/images/test  
+
+nc: 43
+# Classes
+names: ['speed_limit_20_prohibitory', 'speed_limit_30_prohibitory', 'speed_limit_50_prohibitory', 'speed_limit_60_prohibitory', 
+  'speed_limit_70_prohibitory', 'speed_limit_80_prohibitory', 'restriction_ends_80_other', 'speed_limit_100_prohibitory', 
+  'speed_limit_120_prohibitory', 'no_overtaking_prohibitory', 'no_overtaking_trucks_prohibitory', 'priority_at_next_intersection_danger', 
+  'priority_road_other', 'give_way_other', 'stop_other', 'no_traffic_both_ways_prohibitory', 'no_trucks_prohibitory', 'no_entry_other', 
+  'danger_danger', 'bend_left_danger', 'bend_right_danger', 'bend_danger', 'uneven_road_danger', 'slippery_road_danger', 
+  'road_narrows_danger', 'construction_danger', 'traffic_signal_danger', 'pedestrian_crossing_danger', 'school_crossing_danger', 
+  'cycles_crossing_danger', 'snow_danger', 'animals_danger', 'restriction_ends_other', 'go_right_mandatory', 'go_left_mandatory', 
+  'go_straight_mandatory', 'go_right_or_straight_mandatory', 'go_left_or_straight_mandatory', 'keep_right_mandatory', 'keep_left_mandatory', 
+  'roundabout_mandatory', 'restriction_ends_overtaking_other', 'restriction_ends_overtaking_trucks_other']
