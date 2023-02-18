@@ -1,0 +1,49 @@
+path: ../data/train_data
+train: images/train  
+val: images/val  
+
+nc: 43
+names: 
+  0: speed_limit_20_prohibitory
+  1: speed_limit_30_prohibitory
+  2: speed_limit_50_prohibitory
+  3: speed_limit_60_prohibitory
+  4: speed_limit_70_prohibitory
+  5: speed_limit_80_prohibitory
+  6: restriction_ends_80_other
+  7: speed_limit_100_prohibitory
+  8: speed_limit_120_prohibitory
+  9: no_overtaking_prohibitory
+  10: no_overtaking_trucks_prohibitory
+  11: priority_at_next_intersection_danger
+  12: priority_road_other
+  13: give_way_other
+  14: stop_other
+  15: no_traffic_both_ways_prohibitory
+  16: no_trucks_prohibitory
+  17: no_entry_other
+  18: danger_danger
+  19: bend_left_danger
+  20: bend_right_danger
+  21: bend_danger
+  22: uneven_road_danger
+  23: slippery_road_danger
+  24: road_narrows_danger
+  25: construction_danger
+  26: traffic_signal_danger
+  27: pedestrian_crossing_danger
+  28: school_crossing_danger
+  29: cycles_crossing_danger
+  30: snow_danger
+  31: animals_danger
+  32: restriction_ends_other
+  33: go_right_mandatory
+  34: go_left_mandatory
+  35: go_straight_mandatory
+  36: go_right_or_straight_mandatory
+  37: go_left_or_straight_mandatory
+  38: keep_right_mandatory
+  39: keep_left_mandatory
+  40: roundabout_mandatory
+  41: restriction_ends_overtaking_other
+  42: restriction_ends_overtaking_trucks_other
