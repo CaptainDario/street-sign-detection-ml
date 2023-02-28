@@ -1,8 +1,8 @@
 #! /bin/bash
 
+cd yolov8
 echo 'Installing requirements'
 pip install -r requirements.txt
-pip install ultralytics
 
 # train with multi-gpu
 # x
