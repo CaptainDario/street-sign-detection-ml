@@ -23,15 +23,8 @@ python dataset_creation/dataset_convert.py <path/to/the/downloaded/dataset> <pat
 python dataset_creation/dataset_annotation.py <path/to/the/downloaded/dataset> <path/to/the/converted/coordinates>** <path/to/the/annotated/dataset/to/be/stored>
 ```
 
-## YOLO v5
-
-### Install Requirements
-
-```
-git clone https://github.com/ultralytics/yolov5  # clone
-cd yolov5
-pip install -r requirements.txt  # install
-```
+## YOLO
+In the respective YOLO-Directory can be found the source code of the YOLO-Algorithm as well as scripts for training a dataset. 
 
 ### Train
 
@@ -48,13 +41,8 @@ Follow this [guide](https://github.com/ultralytics/yolov5/issues/251)
 
 # Data
 ## Dataset
+The following GTSDB dataset can be applied for the data preparation.
 * https://benchmark.ini.rub.de/gtsdb_dataset.html
-* https://www.cityscapes-dataset.com/dataset-overview/
-* https://www.cvlibs.net/datasets/kitti-360/index.php
-
-## Machine learning algorithms
-* https://github.com/ultralytics/yolov5
-* https://github.com/WongKinYiu/yolov7
 
 ## Data layout
 **note: images and matching label need to have the same name** <br/>
